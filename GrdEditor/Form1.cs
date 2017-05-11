@@ -21,14 +21,19 @@ namespace GrdEditor
                 InitializeComponent();
                 LoadArgs(argv);
                 CalculateBoundsUsingFactors();
-                _tool = new MagnifierTool(this);
+                _tool = new HandTool(this);
             }
             catch (Exception e)
             {
                 MessageBox.Show(String.Format("Source:\n{0}\n\nMessage:{1}", e.Source, e.Message));
             }
+            pictureBox1.MouseWheel += PictureBox1_MouseWheel;
         }
 
+        private void PictureBox1_MouseWheel(object sender, MouseEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
 
         protected override void WndProc(ref Message m)
         {
@@ -72,7 +77,7 @@ namespace GrdEditor
                 _map = new GrdMap(10, 10);
             }
             // Test file
-            _map = new GrdMap(@"C:\Users\Mixon\GRD\relief.grd");
+            _map = new GrdMap(@"C:\Users\Евгений\AppData\Roaming\Skype\My Skype Received Files\relief.grd");
             SynchronizeData();
         }
 
