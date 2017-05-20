@@ -18,6 +18,7 @@ namespace GrdEditor
         public abstract void MouseUpHandler(MouseEventArgs args);
         public abstract void MouseMoveHandler(MouseEventArgs args);
         public abstract void Paint(Graphics g);
+        public abstract void Apply();
 
         protected MainForm _form;
         protected Pen _pen = new Pen(Color.Black);
@@ -228,6 +229,11 @@ namespace GrdEditor
             
         }
 
+        public override void Apply()
+        {
+            throw new NotImplementedException();
+        }
+
         private Int32 oldLeftBound, oldRightBound;
         private Int32 oldUpBound, oldDownBound;
         private Point CursorPos;
@@ -245,6 +251,7 @@ namespace GrdEditor
         {
             base.MouseDownHandler(args);
         }
+
         public override void MouseUpHandler(MouseEventArgs args)
         {
             base.MouseUpHandler(args);
@@ -321,5 +328,86 @@ namespace GrdEditor
                              mapPoint);
             }
         }
+
+        public override void Apply()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class RectangleSelectionTool : RectangleTool
+    {
+        public RectangleSelectionTool(MainForm form) : base(form) { }
+
+        public override void MouseDownHandler(MouseEventArgs args)
+        {
+            base.MouseDownHandler(args);
+        }
+
+        public override void MouseMoveHandler(MouseEventArgs args)
+        {
+            if(!SecondPointInited)
+                base.MouseMoveHandler(args);
+        }
+
+        public override void MouseUpHandler(MouseEventArgs args)
+        {
+            base.MouseUpHandler(args);
+
+            if (args.Button == MouseButtons.Left && FirstPointInited && SecondPointInited)
+            {
+                // Если отпущена ЛКМ и выделение не было сброшено, то перемасштабируем
+
+                int tmp;
+
+                if (FirstPoint.X == SecondPoint.X || FirstPoint.Y == SecondPoint.Y)
+                {
+                    // Если преобразование вырождено - сбрасываем
+                    // выделение и ничего не делаем
+                    FirstPointInited = SecondPointInited = false;
+                    return;
+                }
+
+                // Хотим, чтобы FirstPoint была левой...
+                if (FirstPoint.X > SecondPoint.X)
+                {
+                    tmp = FirstPoint.X;
+                    FirstPoint.X = SecondPoint.X;
+                    SecondPoint.X = tmp;
+                }
+
+                // ... и верхней точкой выделенной области
+                if (FirstPoint.Y > SecondPoint.Y)
+                {
+                    tmp = FirstPoint.Y;
+                    FirstPoint.Y = SecondPoint.Y;
+                    SecondPoint.Y = tmp;
+                }
+
+                //при выделении пусть остаются
+                //FirstPointInited = SecondPointInited = false;
+            }
+        }
+
+        public override void Apply()
+        {
+            int r1, r2, c1, c2, c;
+            c1 = _form.GetColumnFromX(FirstPoint.X);
+            c2 = _form.GetColumnFromX(SecondPoint.X);
+            r1 = _form.GetRowFromY(FirstPoint.Y);
+            r2 = _form.GetRowFromY(SecondPoint.Y);
+            c = c1;
+            double p = (double)_form.numericUpDownP.Value;
+            while (r1 < r2)
+            {
+                _form._map[r1, c] = p;
+                if (++c == c2)
+                {
+                    c = c1;
+                    ++r1;
+                }
+            }
+        }
+
     }
 }

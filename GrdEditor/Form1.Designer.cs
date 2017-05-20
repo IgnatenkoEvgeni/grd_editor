@@ -50,6 +50,9 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.numericUpDownP = new System.Windows.Forms.NumericUpDown();
+            this.Apply = new System.Windows.Forms.Button();
             this._info_label = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -64,6 +67,8 @@
             ((System.ComponentModel.ISupportInitialize)(this._xMaxNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._yMinNumericUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._yMaxNumericUpDown)).BeginInit();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownP)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -119,6 +124,7 @@
             this.tableLayoutPanel3.ColumnCount = 1;
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.Controls.Add(this.groupBox1, 0, 1);
+            this.tableLayoutPanel3.Controls.Add(this.panel1, 0, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0);
@@ -338,6 +344,38 @@
             this.label8.TabIndex = 15;
             this.label8.Text = "Y Max";
             // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.numericUpDownP);
+            this.panel1.Controls.Add(this.Apply);
+            this.panel1.Location = new System.Drawing.Point(3, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(144, 100);
+            this.panel1.TabIndex = 1;
+            // 
+            // numericUpDownP
+            // 
+            this.numericUpDownP.DecimalPlaces = 3;
+            this.numericUpDownP.Location = new System.Drawing.Point(0, 0);
+            this.numericUpDownP.Maximum = new decimal(new int[] {
+            200,
+            0,
+            0,
+            0});
+            this.numericUpDownP.Name = "numericUpDownP";
+            this.numericUpDownP.Size = new System.Drawing.Size(141, 20);
+            this.numericUpDownP.TabIndex = 2;
+            // 
+            // Apply
+            // 
+            this.Apply.Location = new System.Drawing.Point(0, 26);
+            this.Apply.Name = "Apply";
+            this.Apply.Size = new System.Drawing.Size(141, 22);
+            this.Apply.TabIndex = 1;
+            this.Apply.Text = "Apply";
+            this.Apply.UseVisualStyleBackColor = true;
+            this.Apply.Click += new System.EventHandler(this.Apply_Click);
+            // 
             // _info_label
             // 
             this._info_label.AutoSize = true;
@@ -373,6 +411,8 @@
             ((System.ComponentModel.ISupportInitialize)(this._xMaxNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._yMinNumericUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._yMaxNumericUpDown)).EndInit();
+            this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownP)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -402,7 +442,9 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label _info_label;
-
+        private System.Windows.Forms.Button Apply;
+        private System.Windows.Forms.Panel panel1;
+        public System.Windows.Forms.NumericUpDown numericUpDownP;
     }
 }
 

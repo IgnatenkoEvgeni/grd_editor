@@ -21,19 +21,15 @@ namespace GrdEditor
                 InitializeComponent();
                 LoadArgs(argv);
                 CalculateBoundsUsingFactors();
-                _tool = new HandTool(this);
+                _tool = new RectangleSelectionTool(this);
             }
             catch (Exception e)
             {
                 MessageBox.Show(String.Format("Source:\n{0}\n\nMessage:{1}", e.Source, e.Message));
             }
-            pictureBox1.MouseWheel += PictureBox1_MouseWheel;
+
         }
 
-        private void PictureBox1_MouseWheel(object sender, MouseEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
 
         protected override void WndProc(ref Message m)
         {
@@ -213,6 +209,7 @@ namespace GrdEditor
             }
 
             _tool.Paint(g);
+
         }
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
@@ -257,25 +254,25 @@ namespace GrdEditor
             return rc_factor * y + r_offset;
         }
 
-        private int GetColumnFromX(int x)
+        public int GetColumnFromX(int x)
         {
             int col = Convert.ToInt32(rc_factor * x + c_offset);
             return col;
         }
 
-        private int GetRowFromY(int y)
+        public int GetRowFromY(int y)
         {
             int row = Convert.ToInt32(rc_factor * y + r_offset);
             return row;
         }
 
-        private int GetXFromColumn(int column)
+        public int GetXFromColumn(int column)
         {
             int x = Convert.ToInt32(xy_factor * column + x_offset);
             return x;
         }
 
-        private int GetYFromRow(int row)
+        public int GetYFromRow(int row)
         {
             int y = Convert.ToInt32(xy_factor * row + x_offset);
             return y;
@@ -335,7 +332,7 @@ namespace GrdEditor
             pictureBox1.Invalidate();
         }
 
-        GrdMap _map = null;
+        public GrdMap _map = null;
 
         Single[] _high_color = { 1.0f, 0.753f, 0.0f };
         Single[] _low_color = { 0.0f, 0.69f, 0.314f };
@@ -359,6 +356,12 @@ namespace GrdEditor
         private void MainForm_MouseClick(object sender, MouseEventArgs e)
         {
             _info_label.Text = e.Button.ToString();
+        }
+
+        private void Apply_Click(object sender, EventArgs e)
+        {
+            _tool.Apply();
+            UpdatePictureBox();
         }
     }
 }
