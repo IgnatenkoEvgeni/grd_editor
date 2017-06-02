@@ -54,6 +54,7 @@
             this.numericUpDownP = new System.Windows.Forms.NumericUpDown();
             this.Apply = new System.Windows.Forms.Button();
             this._info_label = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -346,6 +347,7 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.comboBox1);
             this.panel1.Controls.Add(this.numericUpDownP);
             this.panel1.Controls.Add(this.Apply);
             this.panel1.Location = new System.Drawing.Point(3, 3);
@@ -356,21 +358,26 @@
             // numericUpDownP
             // 
             this.numericUpDownP.DecimalPlaces = 3;
-            this.numericUpDownP.Location = new System.Drawing.Point(0, 0);
+            this.numericUpDownP.Location = new System.Drawing.Point(3, 30);
             this.numericUpDownP.Maximum = new decimal(new int[] {
-            200,
+            999999,
             0,
             0,
             0});
+            this.numericUpDownP.Minimum = new decimal(new int[] {
+            999999,
+            0,
+            0,
+            -2147483648});
             this.numericUpDownP.Name = "numericUpDownP";
-            this.numericUpDownP.Size = new System.Drawing.Size(141, 20);
+            this.numericUpDownP.Size = new System.Drawing.Size(138, 20);
             this.numericUpDownP.TabIndex = 2;
             // 
             // Apply
             // 
-            this.Apply.Location = new System.Drawing.Point(0, 26);
+            this.Apply.Location = new System.Drawing.Point(3, 56);
             this.Apply.Name = "Apply";
-            this.Apply.Size = new System.Drawing.Size(141, 22);
+            this.Apply.Size = new System.Drawing.Size(138, 22);
             this.Apply.TabIndex = 1;
             this.Apply.Text = "Apply";
             this.Apply.UseVisualStyleBackColor = true;
@@ -384,6 +391,15 @@
             this._info_label.Size = new System.Drawing.Size(35, 13);
             this._info_label.TabIndex = 1;
             this._info_label.Text = "label9";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(3, 3);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(138, 21);
+            this.comboBox1.TabIndex = 3;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // MainForm
             // 
@@ -445,6 +461,7 @@
         private System.Windows.Forms.Button Apply;
         private System.Windows.Forms.Panel panel1;
         public System.Windows.Forms.NumericUpDown numericUpDownP;
+        private System.Windows.Forms.ComboBox comboBox1;
     }
 }
 

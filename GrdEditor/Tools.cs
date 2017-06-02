@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using Rextester;
 
 namespace GrdEditor
 {
@@ -231,7 +233,6 @@ namespace GrdEditor
 
         public override void Apply()
         {
-            throw new NotImplementedException();
         }
 
         private Int32 oldLeftBound, oldRightBound;
@@ -408,6 +409,57 @@ namespace GrdEditor
                 }
             }
         }
+
+    }
+
+    public class PolygranTool : AbstractTool
+    {
+
+        private List<Point> _points;
+        private bool initialised;
+
+        public PolygranTool(MainForm form) : base(form)
+        {
+            _points = new List<Point>();
+            initialised = false;
+        }
+
+        public override void Apply() { }
+
+        public override void MouseDownHandler(MouseEventArgs args)
+        {
+            if(args.Button == MouseButtons.Left)
+            {
+                initialised = true;
+                
+            }
+            if(args.Button == MouseButtons.Right)
+            {
+                _points.Clear();
+            }
+        }
+
+        public override void MouseMoveHandler(MouseEventArgs args) { }
+
+        public override void MouseUpHandler(MouseEventArgs args)
+        {
+            if (initialised)
+            {
+                foreach (Point p in _points) if (p.Equals(args.Location)) return;
+                _points.Add(args.Location);
+                initialised = false;
+            }
+            _form.UpdatePictureBox();
+        }
+
+        public override void Paint(Graphics g) { }
+        
+        
+    }
+
+    public class PointsTool : PolygranTool
+    {
+        public PointsTool(MainForm form) : base(form) { }
 
     }
 }

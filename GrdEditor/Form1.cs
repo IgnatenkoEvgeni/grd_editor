@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GrdApi;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,8 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using GrdApi;
 
 namespace GrdEditor
 {
@@ -21,15 +20,26 @@ namespace GrdEditor
                 InitializeComponent();
                 LoadArgs(argv);
                 CalculateBoundsUsingFactors();
-                _tool = new RectangleSelectionTool(this);
+                comboBoxInit();
+                _tool = new PolygranTool(this);
+                pictureBox1.MouseWheel += PictureBox_MouseWheel;
             }
             catch (Exception e)
             {
                 MessageBox.Show(String.Format("Source:\n{0}\n\nMessage:{1}", e.Source, e.Message));
             }
-
+            
         }
-
+        private void PictureBox_MouseWheel(object sender, MouseEventArgs args)
+        {
+            double wheel = wheelsensitivity * args.Delta / 12000;
+            int dy = Convert.ToInt32((upBound - downBound) * wheel);
+            int dx = Convert.ToInt32((rightBound - leftBound) * wheel);
+            upBound -= dy;
+            downBound += dy;
+            pictureBox1.Invalidate();
+            label1.Text = dy.ToString();
+        }
 
         protected override void WndProc(ref Message m)
         {
@@ -144,8 +154,8 @@ namespace GrdEditor
             if (ValidCell(row, col))
             {
 
-                Single alpha = Convert.ToSingle(_map[row, col]) * z_factor + z_offset;
-                Single beta = 1.0f - alpha;
+                Single beta = Convert.ToSingle(_map[row, col]) * z_factor + z_offset;
+                Single alpha = 1.0f - beta;
 
                 for (i = 0; i < 3; ++i)
                 {
@@ -182,6 +192,7 @@ namespace GrdEditor
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
+            CalculateZTransformation();
             var g = e.Graphics;
             PictureBox box = sender as PictureBox;
 
@@ -278,6 +289,22 @@ namespace GrdEditor
             return y;
         }
 
+        public Point GetMapFromPic(Point point)
+        {
+            Point outp = new Point();
+            outp.X = GetColumnFromX(point.X);
+            outp.Y = GetRowFromY(point.Y);
+            return outp;
+        }
+
+        public Point GetPicFromMap(Point point)
+        {
+            Point outp = new Point();
+            outp.X = GetXFromColumn(point.X);
+            outp.Y = GetYFromRow(point.Y);
+            return outp;
+        }
+
         private void CalculateBoundsUsingFactors()
         {
             upBound = GetYFromRow(0);
@@ -349,7 +376,32 @@ namespace GrdEditor
 
         // Границы, в которые переходят границы карты
         public Int32 upBound, downBound;
+
+        //comboBox выбор инструмента
+        private Dictionary<string, AbstractTool> changeTool;
+        private void comboBoxInit()
+        {
+            comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
+            changeTool = new Dictionary<string, AbstractTool>
+            {
+                {"Hand", new HandTool(this)},
+                {"RectangleSelection", new RectangleSelectionTool(this)},
+                {"Magnifier", new MagnifierTool(this)}
+            };
+            foreach(string key in changeTool.Keys)
+            {
+                comboBox1.Items.Add(key);
+            }
+        }
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            _tool = changeTool[comboBox1.SelectedItem.ToString()];
+        }
+
         public Int32 leftBound, rightBound;
+
+        //колесо
+        float wheelsensitivity = 1;
 
         AbstractTool _tool;
 
