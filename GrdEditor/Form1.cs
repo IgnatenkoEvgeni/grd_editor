@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace GrdEditor
 {
@@ -396,6 +397,48 @@ namespace GrdEditor
             }
         }
 
+        // МЕНЮ. сделано коряво, событие привязано к обеим кнопкам и проверяет, какая нажата. Сохранение и загрузка
+        private void toolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (sender.Equals(toolStripMenuItemLoad))
+            {
+                Stream myStream;
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+
+                saveFileDialog.Filter = "grd files (*.grd)|*.grd";
+                saveFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    if ((myStream = openFileDialog.OpenFile()) != null)
+                    {
+                        // сама загрузка
+                        myStream.Close();
+                        _map = new GrdMap(openFileDialog.FileName);
+                    }
+                }
+            }
+            if (sender.Equals(toolStripMenuItemSave))
+            {
+                Stream myStream;
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+                saveFileDialog.Filter = "grd files (*.grd)|*.grd";
+                saveFileDialog.FilterIndex = 1;
+                saveFileDialog.RestoreDirectory = true;
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    if ((myStream = saveFileDialog.OpenFile()) != null)
+                    {
+                        // само сохранение
+                        myStream.Close();
+                        _map.Save(saveFileDialog.FileName);
+                    }
+                }
+            }
+        }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {

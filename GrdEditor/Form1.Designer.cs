@@ -430,12 +430,14 @@
             this.toolStripMenuItemLoad.Name = "toolStripMenuItemLoad";
             this.toolStripMenuItemLoad.Size = new System.Drawing.Size(152, 22);
             this.toolStripMenuItemLoad.Text = "Load";
+            this.toolStripMenuItemLoad.Click += new System.EventHandler(this.toolStripMenuItem_Click);
             // 
             // toolStripMenuItemSave
             // 
             this.toolStripMenuItemSave.Name = "toolStripMenuItemSave";
             this.toolStripMenuItemSave.Size = new System.Drawing.Size(152, 22);
             this.toolStripMenuItemSave.Text = "Save";
+            this.toolStripMenuItemSave.Click += new System.EventHandler(this.toolStripMenuItem_Click);
             // 
             // MainForm
             // 
