@@ -452,7 +452,7 @@ namespace GrdEditor
             _form.UpdatePictureBox();
         }
 
-        public override void Paint(Graphics g) { }
+        public override void Paint(Graphics g) { Point[] p = _points.ToArray(); if (_points.Count > 1)g.DrawPolygon(_pen, p); }
         
         
     }
@@ -460,6 +460,8 @@ namespace GrdEditor
     public class PointsTool : PolygranTool
     {
         public PointsTool(MainForm form) : base(form) { }
+
+
 
     }
 }

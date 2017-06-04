@@ -378,24 +378,28 @@ namespace GrdEditor
         public Int32 upBound, downBound;
 
         //comboBox выбор инструмента
-        private Dictionary<string, AbstractTool> changeTool;
+        private Dictionary<string, Func<AbstractTool>> changeTool;
         private void comboBoxInit()
         {
             comboBox1.DropDownStyle = ComboBoxStyle.DropDownList;
-            changeTool = new Dictionary<string, AbstractTool>
+            // нужные инструменты заносить в словарь здесь
+            changeTool = new Dictionary<string, Func<AbstractTool>>
             {
-                {"Hand", new HandTool(this)},
-                {"RectangleSelection", new RectangleSelectionTool(this)},
-                {"Magnifier", new MagnifierTool(this)}
+                {"Hand", () => new HandTool(this)},
+                {"RectangleSelection", () => new RectangleSelectionTool(this)},
+                {"Magnifier", () => new MagnifierTool(this)},
+                {"Polygran", () => new PolygranTool(this)}
             };
             foreach(string key in changeTool.Keys)
             {
                 comboBox1.Items.Add(key);
             }
         }
+
+
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _tool = changeTool[comboBox1.SelectedItem.ToString()];
+            _tool = changeTool[comboBox1.SelectedItem.ToString()]();
         }
 
         public Int32 leftBound, rightBound;
