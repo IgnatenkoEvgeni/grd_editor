@@ -22,8 +22,8 @@ namespace GrdEditor
                 LoadArgs(argv);
                 CalculateBoundsUsingFactors();
                 comboBoxInit();
-                _tool = new PolygranTool(this);
-                pictureBox1.MouseWheel += PictureBox_MouseWheel;
+                comboBox1.SelectedIndex = 0;
+                pictureBox.MouseWheel += PictureBox_MouseWheel;
             }
             catch (Exception e)
             {
@@ -31,47 +31,28 @@ namespace GrdEditor
             }
             
         }
+
+
         private void PictureBox_MouseWheel(object sender, MouseEventArgs args)
         {
-            double wheel = wheelsensitivity * args.Delta / 12000;
-            int dy = Convert.ToInt32((upBound - downBound) * wheel);
-            int dx = Convert.ToInt32((rightBound - leftBound) * wheel);
-            upBound -= dy;
-            downBound += dy;
-            pictureBox1.Invalidate();
-            label1.Text = dy.ToString();
+            // wheelsensitivity задает чувствительность колеса
+            double wheel = wheelsensitivity * args.Delta / 120;
+
+            double single_scale = 1.05; // Увеличиваем масштаб на 5% на каждое прокручивание колеса
+            PointF fixed_rc = new PointF(GetColumnFromX(args.Location.X), GetRowFromY(args.Location.Y));
+            xy_factor *= (float)Math.Pow(single_scale, wheel);
+            x_offset = args.Location.X - xy_factor * fixed_rc.X;
+            y_offset = args.Location.Y - xy_factor * fixed_rc.Y;
+
+            //Считаем обратное преобразование:
+            rc_factor = 1.0f / xy_factor;
+            r_offset = -y_offset * rc_factor;
+            c_offset = -x_offset * rc_factor;
+            CalculateBoundsUsingFactors();
+            pictureBox.Invalidate();
         }
 
-        protected override void WndProc(ref Message m)
-        {
-            if (m.Msg == 0x020A)
-            {
-                _info_label.Text = m.ToString();
-            }
-            base.WndProc(ref m);
-        }
-
-        public override bool PreProcessMessage(ref Message m)
-        {
-            if (m.Msg == 0x020A)
-            {
-                _info_label.Text = m.ToString();
-            }
-            return base.PreProcessMessage(ref m);
-        }
-
-        protected override void OnNotifyMessage(Message m)
-        {
-            if (m.Msg == 0x020A)
-            {
-                _info_label.Text = m.ToString();
-                Refresh();
-            }
-            else
-            {
-                base.OnNotifyMessage(m);
-            }
-        }
+        
         
         private void LoadArgs(String[] argv)
         {
@@ -81,10 +62,10 @@ namespace GrdEditor
             }
             else
             {
-                _map = new GrdMap(10, 10);
+                _map = new GrdMap(1000, 1000);
             }
             // Test file
-            _map = new GrdMap(@"C:\Users\Евгений\AppData\Roaming\Skype\My Skype Received Files\relief.grd");
+            //_map = new GrdMap(@"C:\Users\Евгений\AppData\Roaming\Skype\My Skype Received Files\relief.grd");
             SynchronizeData();
         }
 
@@ -245,7 +226,7 @@ namespace GrdEditor
         {
             get
             {
-                return pictureBox1.Size;
+                return pictureBox.Size;
             }
         }
         public Size MapSize
@@ -316,8 +297,8 @@ namespace GrdEditor
 
         private void CalculateFactorsUsingBounds(Point CursorPos, PointF MapPos)
         {
-            Single w = pictureBox1.Width;
-            Single h = pictureBox1.Height;
+            Single w = pictureBox.Width;
+            Single h = pictureBox.Height;
             Single columnCount = Convert.ToSingle(_map.ColumnCount);
             Single rowCount = Convert.ToSingle(_map.RowCount);
 
@@ -351,13 +332,13 @@ namespace GrdEditor
         public void UpdateTransformation(Point CursorPos, PointF MapPos)
         {
             CalculateFactorsUsingBounds(CursorPos, MapPos);
-            pictureBox1.Invalidate();
+            pictureBox.Invalidate();
             Refresh();
         }
 
         public void UpdatePictureBox()
         {
-            pictureBox1.Invalidate();
+            pictureBox.Invalidate();
         }
 
         public GrdMap _map = null;
@@ -387,9 +368,10 @@ namespace GrdEditor
             changeTool = new Dictionary<string, Func<AbstractTool>>
             {
                 {"Hand", () => new HandTool(this)},
-                {"RectangleSelection", () => new RectangleSelectionTool(this)},
+                {"Rectangle", () => new RectangleSelectionTool(this)},
                 {"Magnifier", () => new MagnifierTool(this)},
-                {"Polygran", () => new PolygranTool(this)}
+                {"Polygon", () => new PolygonTool(this)},
+                {"Points", () => new PointsTool(this)}
             };
             foreach(string key in changeTool.Keys)
             {
@@ -400,13 +382,13 @@ namespace GrdEditor
         // МЕНЮ. сделано коряво, событие привязано к обеим кнопкам и проверяет, какая нажата. Сохранение и загрузка
         private void toolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (sender.Equals(toolStripMenuItemLoad))
+            if (sender.Equals(toolStripMenuItemOpen))
             {
                 Stream myStream;
                 OpenFileDialog openFileDialog = new OpenFileDialog();
 
-                saveFileDialog.Filter = "grd files (*.grd)|*.grd";
-                saveFileDialog.FilterIndex = 1;
+                openFileDialog.Filter = "grd files (*.grd)|*.grd";
+                openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)

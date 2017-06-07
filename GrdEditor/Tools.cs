@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using Rextester;
+using Bresenham;
 
 namespace GrdEditor
 {
@@ -226,14 +226,9 @@ namespace GrdEditor
             }
         }
 
-        public override void Paint(Graphics g)
-        {
-            
-        }
+        public override void Paint(Graphics g) { }
 
-        public override void Apply()
-        {
-        }
+        public override void Apply() { }
 
         private Int32 oldLeftBound, oldRightBound;
         private Int32 oldUpBound, oldDownBound;
@@ -330,10 +325,7 @@ namespace GrdEditor
             }
         }
 
-        public override void Apply()
-        {
-            throw new NotImplementedException();
-        }
+        public override void Apply(){ }
     }
 
     public class RectangleSelectionTool : RectangleTool
@@ -399,7 +391,7 @@ namespace GrdEditor
             r2 = _form.GetRowFromY(SecondPoint.Y);
             c = c1;
             double p = (double)_form.numericUpDownP.Value;
-            while (r1 < r2)
+            while (r1 <= r2)
             {
                 _form._map[r1, c] = p;
                 if (++c == c2)
@@ -412,13 +404,13 @@ namespace GrdEditor
 
     }
 
-    public class PolygranTool : AbstractTool
+    public abstract class AbstractPolygonTool : AbstractTool
     {
 
-        private List<Point> _points;
-        private bool initialised;
+        protected List<Point> _points;
+        protected bool initialised;
 
-        public PolygranTool(MainForm form) : base(form)
+        public AbstractPolygonTool(MainForm form) : base(form)
         {
             _points = new List<Point>();
             initialised = false;
@@ -452,16 +444,98 @@ namespace GrdEditor
             _form.UpdatePictureBox();
         }
 
-        public override void Paint(Graphics g) { Point[] p = _points.ToArray(); if (_points.Count > 1)g.DrawPolygon(_pen, p); }
+        public override void Paint(Graphics g) { }
         
         
     }
 
-    public class PointsTool : PolygranTool
+    public class PointsTool : AbstractPolygonTool
     {
-        public PointsTool(MainForm form) : base(form) { }
+        public PointsTool(MainForm form) : base(form)
+        {
+        }
+
+        public override void MouseDownHandler(MouseEventArgs args)
+        {
+            base.MouseDownHandler(args);
+        }
+
+        public override void MouseMoveHandler(MouseEventArgs args)
+        {
+            base.MouseMoveHandler(args);
+            if (initialised)
+            {
+                foreach (Point p in _points) if (p.Equals(args.Location)) return;
+                _points.Add(args.Location);
+            }
+            _form.UpdatePictureBox();
+        }
+
+        public override void MouseUpHandler(MouseEventArgs args)
+        {
+            base.MouseUpHandler(args);
+            initialised = false;
+        }
+
+        public override void Paint(Graphics g)
+        {
+            Brush brush = Brushes.Black;
+            foreach(Point point in _points)
+            {
+                g.FillRectangle(brush, point.X, point.Y, 2, 2);
+            }
+        }
+
+        public override void Apply()
+        {
+            int c, r;
+            double value = (double)_form.numericUpDownP.Value;
+            foreach (Point point in _points)
+            {
+                c = _form.GetColumnFromX(point.X);
+                r = _form.GetRowFromY(point.Y);
+                _form._map[r, c] = value;
+            }
+        }
 
 
+    }
 
+    public class PolygonTool : AbstractPolygonTool
+    {
+        public PolygonTool(MainForm form) : base(form) { }
+
+        public override void MouseDownHandler(MouseEventArgs args)
+        {
+            base.MouseDownHandler(args);
+        }
+
+        public override void MouseMoveHandler(MouseEventArgs args)
+        {
+            base.MouseMoveHandler(args);
+        }
+
+        public override void MouseUpHandler(MouseEventArgs args)
+        {
+            base.MouseUpHandler(args);
+        }
+
+        public override void Paint(Graphics g)
+        {
+            Point[] p = _points.ToArray(); if (_points.Count > 1) g.DrawPolygon(_pen, p);
+        }
+
+        public override void Apply()
+        {
+            var builder = new PolygonBuilder(_points.ToArray());
+            var pnt = new Point();
+            double value = (double)_form.numericUpDownP.Value;
+
+            while (builder.NextPoint(ref pnt))
+            {
+                pnt = _form.GetMapFromPic(pnt);
+                _form._map[pnt.Y, pnt.X] = value;
+            }
+        }
     }
 }
