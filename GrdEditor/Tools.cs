@@ -446,7 +446,6 @@ namespace GrdEditor
 
         public override void Paint(Graphics g) { }
         
-        
     }
 
     public class PointsTool : AbstractPolygonTool
@@ -527,15 +526,18 @@ namespace GrdEditor
 
         public override void Apply()
         {
-            var builder = new PolygonBuilder(_points.ToArray());
+            Point[] arr = new Point[_points.Count];
+            for (int i = 0; i < _points.Count; i++)
+                arr[i] = _form.GetMapFromPic(_points[i]);
+            var builder = new PolygonBuilder(arr);
             var pnt = new Point();
             double value = (double)_form.numericUpDownP.Value;
 
             while (builder.NextPoint(ref pnt))
             {
-                pnt = _form.GetMapFromPic(pnt);
                 _form._map[pnt.Y, pnt.X] = value;
             }
         }
+
     }
 }

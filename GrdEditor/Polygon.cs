@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace Bresenham
@@ -9,10 +10,8 @@ namespace Bresenham
         {
             cur = this.p1 = p1;
             this.p2 = p2;
-
             int dx = p1.X - p2.X;
             int dy = p1.Y - p2.Y;
-
             sy = dy < 0 ? 1 : -1;
             sx = dx < 0 ? 1 : -1;
 
@@ -296,102 +295,192 @@ namespace Bresenham
     public class PolygonBuilder
     {
         public PolygonBuilder(Point[] points)
-        {  
+        {
+            int points_len = points.Length;
+            if (points == null)
+            {
+                throw new Exception("Argument \"points\" is null!");
+            }
+            else if (points_len < 3)
+            {
+                throw new Exception("Length of \"points\" is too short!");
+            }
+
             this.points = points;
 
-            
+            int i;
+            int x_cur, y_cur;
 
+            this.x_min = this.x_max = points[0].X;
+            this.y_min = this.y_max = points[0].Y;
 
-            this.triangle_builder = new TriangleBuilder(points[0], points[1], points[2]);
-            this.СalcCircumscribedRectangleBounds();
+            for (i = 1; i < points_len; ++i)
+            {
+                x_cur = points[i].X;
+                y_cur = points[i].Y;
+
+                if (this.x_min > x_cur) this.x_min = x_cur;
+                else if (this.x_max < x_cur) this.x_max = x_cur;
+
+                if (this.y_min > y_cur) this.y_min = y_cur;
+                else if (this.y_max < y_cur) this.y_max = y_cur;
+            }
+
+            this.width = 1 + (++this.x_max) - (--this.x_min);
+            this.height = 1 + (++this.y_max) - (--this.y_min);
+
+            int pixel_count = this.width * this.height;
+
+            this.status = new byte[pixel_count];
+            for (i = 0; i < pixel_count; ++i)
+            {
+                this.status[i] = INSIDE;
+            }
+            this.SetBorders();
+            this.Explore();
+            this.SetFirst();
         }
 
         public bool NextPoint(ref Point pnt)
         {
+            if (this.cur_row > this.y_max) return false;
+
+            pnt.X = this.cur_column;
+            pnt.Y = this.cur_row;
+
+            while (true)
+            {
+                if (++this.cur_column > this.x_max)
+                {
+                    this.cur_column = this.x_min + 1;
+                    if (++this.cur_row > this.y_max)
+                    {
+                        break;
+                    }
+                }
+
+                if (this.GetPixelStatus(new Point(this.cur_column, this.cur_row)) != OUTSIDE) break;
+            }
+
+            return true;
+        }
+
+        private void SetBorders()
+        {
+            int last_idx = this.points.Length - 1;
+            int start_idx = 0;
+            int finish_idx = last_idx;
+
+            LineBuilder b = null;
+            Point cur_pnt = new Point();
+
             do
             {
-                if (!this.triangle_builder.NextPoint(ref pnt))
+                cur_pnt = this.points[start_idx];
+                b = new LineBuilder(cur_pnt, this.points[finish_idx]);
+
+                do
                 {
-                    if (this.next_vertex_index >= this.points.Length)
+                    this.SetPixelStatus(cur_pnt, ON_BORDER);
+                }
+                while (b.NextPoint(ref cur_pnt));
+
+                finish_idx = start_idx++;
+            }
+            while (start_idx <= last_idx);
+        }
+
+        private void SetPixelStatus(Point pnt, byte status)
+        {
+            int idx = pnt.X - this.x_min + this.width * (pnt.Y - this.y_min);
+            this.status[idx] = status;
+        }
+
+        private byte GetPixelStatus(Point pnt)
+        {
+            int idx = pnt.X - this.x_min + this.width * (pnt.Y - this.y_min);
+            return this.status[idx];
+        }
+
+        private bool CanVisit(Point p)
+        {
+            return p.X >= this.x_min && p.X <= this.x_max && p.Y >= this.y_min && p.Y <= this.y_max && GetPixelStatus(p) == INSIDE;
+        }
+
+        private void Explore()
+        {
+            int i;
+            Stack<Point> stack = new Stack<Point>();
+
+            Point pos = new Point(this.x_min, this.y_min);
+            Point nxt = new Point();
+
+            int[] x_offset = { 1, 0, -1, 0 };
+            int[] y_offset = { 0, 1, 0, -1 };
+
+            while (true)
+            {
+                this.SetPixelStatus(pos, OUTSIDE);
+
+                for (i = 0; i < 4; ++i)
+                {
+                    nxt.X = pos.X + x_offset[i];
+                    nxt.Y = pos.Y + y_offset[i];
+                    if (this.CanVisit(nxt))
                     {
-                        return false;
+                        break;
                     }
-                    this.triangle_builder = new TriangleBuilder(
-                        this.points[0],
-                        this.points[this.next_vertex_index - 1],
-                        this.points[this.next_vertex_index]
-                    );
-                    ++this.next_vertex_index;
+                }
+
+                if (i < 4)
+                {
+                    stack.Push(pos);
+                    pos = nxt;
                 }
                 else
                 {
-                    if (!this.IsUsed(pnt))
+                    try
                     {
-                        return true;
+                        pos = stack.Pop();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        break;
                     }
                 }
             }
-            while (true);
         }
 
-        private void СalcCircumscribedRectangleBounds()
+        private void SetFirst()
         {
-            int x_max, y_max;
+            Point pnt = new Point(this.x_min + 1, this.y_min + 1);
 
-            this.x_min = x_max = this.points[0].X;
-            this.y_min = y_max = this.points[0].Y;
-
-            foreach (Point pnt in this.points)
+            for (; pnt.Y <= this.y_max; ++pnt.Y)
             {
-                if (pnt.X < this.x_min)
+                for (pnt.X = this.x_min + 1; pnt.X < this.x_max; ++pnt.X)
                 {
-                    this.x_min = pnt.X;
+                    if (this.GetPixelStatus(pnt) != OUTSIDE)
+                    {
+                        this.cur_column = pnt.X;
+                        this.cur_row = pnt.Y;
+                        return;
+                    }
                 }
-                else if (pnt.X > x_max)
-                {
-                    x_max = pnt.X;
-                }
-                if (pnt.Y < this.y_min)
-                {
-                    this.y_min = pnt.Y;
-                }
-                else if (pnt.Y > y_max)
-                {
-                    y_max = pnt.Y;
-                }
-            }
-
-            this.column_count = x_max - this.x_min + 1;
-            int dy = y_max - this.y_min + 1;
-            int cell_count = this.column_count * dy;
-
-            this.used = new bool[cell_count];
-            for (int i = 0; i < cell_count; ++i)
-            {
-                this.used[i] = false;
-            }
-        }
-
-        private bool IsUsed(Point pnt)
-        {
-            int dx = pnt.X - this.x_min;
-            int dy = pnt.Y - this.y_min;
-            int cell_idx = dy * this.column_count + dx;
-            if (this.used[cell_idx])
-            {
-                return true;
-            }
-            else
-            {
-                this.used[cell_idx] = true;
-                return false;
             }
         }
 
         private Point[] points = null;
-        private TriangleBuilder triangle_builder = null;
-        private int next_vertex_index = 3;
-        private int x_min, y_min, column_count;
-        private bool[] used = null;
+        private byte[] status = null;
+        private int x_min, y_min;
+        private int x_max, y_max;
+        private int width, height;
+
+        private int cur_column = 1;
+        private int cur_row = 1;
+
+        private const byte INSIDE = 0;
+        private const byte OUTSIDE = 1;
+        private const byte ON_BORDER = 2;
     }
+
 }

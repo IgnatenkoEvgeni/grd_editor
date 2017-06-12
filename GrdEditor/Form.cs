@@ -32,7 +32,6 @@ namespace GrdEditor
             
         }
 
-
         private void PictureBox_MouseWheel(object sender, MouseEventArgs args)
         {
             // wheelsensitivity задает чувствительность колеса
@@ -51,9 +50,7 @@ namespace GrdEditor
             CalculateBoundsUsingFactors();
             pictureBox.Invalidate();
         }
-
-        
-        
+     
         private void LoadArgs(String[] argv)
         {
             if (argv.Length > 0)
@@ -218,7 +215,6 @@ namespace GrdEditor
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            //_info_label.Text = String.Format("X = {0}, Y = {1}", e.X, e.Y);
             _tool.MouseMoveHandler(e);
         }
 
@@ -229,6 +225,7 @@ namespace GrdEditor
                 return pictureBox.Size;
             }
         }
+
         public Size MapSize
         {
             get
@@ -342,9 +339,10 @@ namespace GrdEditor
         }
 
         public GrdMap _map = null;
+        private Color[,] _colorMap = null;
 
         Single[] _high_color = { 1.0f, 0.753f, 0.0f };
-        Single[] _low_color = { 0.0f, 0.69f, 0.314f };
+        Single[] _low_color = { 0.0f, 0.30f, 0.18f };
         Single[] _def_color1 = { 0.0f, 0.0f, 0.0f };
         Single[] _def_color2 = { 0.5f, 0.0f, 1.0f };
         Single z_factor, z_offset;
@@ -358,6 +356,11 @@ namespace GrdEditor
 
         // Границы, в которые переходят границы карты
         public Int32 upBound, downBound;
+        public Int32 leftBound, rightBound;
+        //колесо
+        float wheelsensitivity = 1;
+        //текущий инструмент
+        AbstractTool _tool;
 
         //comboBox выбор инструмента
         private Dictionary<string, Func<AbstractTool>> changeTool;
@@ -420,6 +423,7 @@ namespace GrdEditor
                     }
                 }
             }
+            SynchronizeData();
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -427,12 +431,7 @@ namespace GrdEditor
             _tool = changeTool[comboBox1.SelectedItem.ToString()]();
         }
 
-        public Int32 leftBound, rightBound;
 
-        //колесо
-        float wheelsensitivity = 1;
-
-        AbstractTool _tool;
 
         private void MainForm_MouseClick(object sender, MouseEventArgs e)
         {

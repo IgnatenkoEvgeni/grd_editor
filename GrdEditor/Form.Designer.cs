@@ -240,6 +240,7 @@
             this._rowCountNumericUpDown.Location = new System.Drawing.Point(57, 0);
             this._rowCountNumericUpDown.Margin = new System.Windows.Forms.Padding(0);
             this._rowCountNumericUpDown.Name = "_rowCountNumericUpDown";
+            this._rowCountNumericUpDown.ReadOnly = true;
             this._rowCountNumericUpDown.Size = new System.Drawing.Size(87, 20);
             this._rowCountNumericUpDown.TabIndex = 4;
             // 
@@ -249,6 +250,7 @@
             this._columnCountNumericUpDown.Location = new System.Drawing.Point(57, 24);
             this._columnCountNumericUpDown.Margin = new System.Windows.Forms.Padding(0);
             this._columnCountNumericUpDown.Name = "_columnCountNumericUpDown";
+            this._columnCountNumericUpDown.ReadOnly = true;
             this._columnCountNumericUpDown.Size = new System.Drawing.Size(87, 20);
             this._columnCountNumericUpDown.TabIndex = 5;
             this._columnCountNumericUpDown.ValueChanged += new System.EventHandler(this.numericUpDown2_ValueChanged);
@@ -260,6 +262,7 @@
             this._defaultDataNumericUpDown.Location = new System.Drawing.Point(57, 48);
             this._defaultDataNumericUpDown.Margin = new System.Windows.Forms.Padding(0);
             this._defaultDataNumericUpDown.Name = "_defaultDataNumericUpDown";
+            this._defaultDataNumericUpDown.ReadOnly = true;
             this._defaultDataNumericUpDown.Size = new System.Drawing.Size(87, 20);
             this._defaultDataNumericUpDown.TabIndex = 6;
             this._defaultDataNumericUpDown.ValueChanged += new System.EventHandler(this.numericUpDown3_ValueChanged);
@@ -270,6 +273,7 @@
             this._textDataTextBox.Location = new System.Drawing.Point(57, 72);
             this._textDataTextBox.Margin = new System.Windows.Forms.Padding(0);
             this._textDataTextBox.Name = "_textDataTextBox";
+            this._textDataTextBox.ReadOnly = true;
             this._textDataTextBox.Size = new System.Drawing.Size(87, 20);
             this._textDataTextBox.TabIndex = 7;
             this._textDataTextBox.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
@@ -280,6 +284,7 @@
             this._xMinNumericUpDown.Dock = System.Windows.Forms.DockStyle.Fill;
             this._xMinNumericUpDown.Location = new System.Drawing.Point(60, 99);
             this._xMinNumericUpDown.Name = "_xMinNumericUpDown";
+            this._xMinNumericUpDown.ReadOnly = true;
             this._xMinNumericUpDown.Size = new System.Drawing.Size(81, 20);
             this._xMinNumericUpDown.TabIndex = 8;
             // 
@@ -289,6 +294,7 @@
             this._xMaxNumericUpDown.Dock = System.Windows.Forms.DockStyle.Fill;
             this._xMaxNumericUpDown.Location = new System.Drawing.Point(60, 123);
             this._xMaxNumericUpDown.Name = "_xMaxNumericUpDown";
+            this._xMaxNumericUpDown.ReadOnly = true;
             this._xMaxNumericUpDown.Size = new System.Drawing.Size(81, 20);
             this._xMaxNumericUpDown.TabIndex = 9;
             // 
@@ -298,6 +304,7 @@
             this._yMinNumericUpDown.Dock = System.Windows.Forms.DockStyle.Fill;
             this._yMinNumericUpDown.Location = new System.Drawing.Point(60, 147);
             this._yMinNumericUpDown.Name = "_yMinNumericUpDown";
+            this._yMinNumericUpDown.ReadOnly = true;
             this._yMinNumericUpDown.Size = new System.Drawing.Size(81, 20);
             this._yMinNumericUpDown.TabIndex = 10;
             // 
@@ -307,6 +314,7 @@
             this._yMaxNumericUpDown.Dock = System.Windows.Forms.DockStyle.Fill;
             this._yMaxNumericUpDown.Location = new System.Drawing.Point(60, 171);
             this._yMaxNumericUpDown.Name = "_yMaxNumericUpDown";
+            this._yMaxNumericUpDown.ReadOnly = true;
             this._yMaxNumericUpDown.Size = new System.Drawing.Size(81, 20);
             this._yMaxNumericUpDown.TabIndex = 11;
             // 
